@@ -3,15 +3,31 @@ import difflib
 import shlex
 from typing import Tuple
 import sys
+import os
 
-# if any requirements are cahnged then install that requirement
-async def lines_differnce(file1, file2):
-    with open(file1) as f1:
-        lines1 = f1.readlines()
-        lines1 = [line.rstrip("\n") for line in lines1]
-    with open(file2) as f2:
-        lines2 = f2.readlines()
-        lines2 = [line.rstrip("\n") for line in lines2]
+# دالة للتحقق من وجود الملفات بشكل مرن متوافق مع الاستضافات السحابية
+def get_absolute_path(filename: str) -> str:
+    if os.path.exists(filename):
+        return filename
+    # إذا لم يجد الملف، يبحث عنه في مجلد العمل الحالي (مثال: /app على رايلوي)
+    current_dir_file = os.path.join(os.getcwd(), os.path.basename(filename))
+    if os.path.exists(current_dir_file):
+        return current_dir_file
+    return filename
+
+async def lines_difference(file1, file2):
+    file1 = get_absolute_path(file1)
+    file2 = get_absolute_path(file2)
+    
+    try:
+        with open(file1, "r", encoding="utf-8") as f1:
+            lines1 = [line.rstrip("\n") for line in f1.readlines()]
+        with open(file2, "r", encoding="utf-8") as f2:
+            lines2 = [line.rstrip("\n") for line in f2.readlines()]
+    except FileNotFoundError as e:
+        print(f"⚠️ [Updater] تخطي تحديث المكتبات: لم يتم العثور على الملف -> {e.filename}")
+        return [], []
+
     diff = difflib.unified_diff(
         lines1, lines2, fromfile=file1, tofile=file2, lineterm="", n=0
     )
@@ -35,6 +51,37 @@ async def runcmd(cmd: str) -> Tuple[str, str, int, int]:
         process.returncode,
         process.pid,
     )
+
+
+async def update_requirements(main, test):
+    a, r = await lines_difference(main, test)
+    if not a:
+        print("✅ [Updater] جميع المكتبات محدثة بالفعل.")
+        return
+        
+    try:
+        for i in a:
+            # تنظيف النص لتجنب الأسطر الفارغة أو التعليقات في ملف requirements
+            package = i.strip()
+            if package and not package.startswith("#"):
+                print(f"⏳ جاري تثبيت المكتبة الجديدة: {package} ...")
+                stdout, stderr, code, pid = await runcmd(f"pip install {package}")
+                if code == 0:
+                    print(f"✅ تم تثبيت {package} بنجاح.")
+                else:
+                    print(f"❌ فشل تثبيت {package}: {stderr}")
+    except Exception as e:
+        print(f"⚠️ خطأ أثناء تحديث المكتبات: {str(e)}")
+
+
+if __name__ == "__main__":
+    # التحقق من أن الوسائط تم تمريرها بشكل صحيح، وإلا نضع قيم افتراضية منعاً للـ Crash
+    main_file = sys.argv[1] if len(sys.argv) > 1 else "requirements.txt"
+    test_file = sys.argv[2] if len(sys.argv) > 2 else "requirements.txt"
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(update_requirements(main_file, test_file))
+    loop.close()    )
 
 
 async def update_requirements(main , test):
