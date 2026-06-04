@@ -103,7 +103,7 @@ _set_bot () {
 
     # تحديث المتطلبات إذا تغيرت
     if [[ -f requirements.txt ]]; then
-        python3 ../setup/updater.py ../requirements.txt requirements.txt
+        python3  /setup/updater.py  /requirements.txt requirements.txt
     fi
 
     # إعداد git للتحديثات (اختياري)
@@ -113,7 +113,7 @@ _set_bot () {
 
     echo "⌭ جاري بدء تشغيل $module ⌭"
     echo ""
-    python3 -m "$module"
+    python3 -m "Tython"
 }
 
 _set_bot
