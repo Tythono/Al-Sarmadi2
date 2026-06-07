@@ -2,8 +2,8 @@
 
 _get_ziplink () {
     local regex
-    regex='(https?)://github.com/.+/.+'
-    if [[ $UPSTREAM_REPO == "TythonAr" ]]
+    regex='(https?):/github.com/Tythono/Tython90.git'
+    if [[ $UPSTREAM_REPO == "Tython90" ]]
     then
         if [[ $GITHUB_TOKEN ]]
         then
@@ -44,7 +44,7 @@ _get_ziplink () {
 _get_repolink () {
     local regex
     local rlink
-    regex='(https?)://github.com/.+/.+'
+    regex='(https?):/github.com/Tythono/Tython90.git'
     if [[ $UPSTREAM_REPO == "Deploy" ]]
     then
         rlink=`echo "aHR0cHM6Ly9naXRodWIuY29tL1R5dGhvbm8vQWwtU2FybWFkaTI=" | base64 -d`
