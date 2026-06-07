@@ -1,0 +1,32 @@
+services:
+  - type: web
+    runtime: docker
+    name: arwa-baqir
+    plan: free
+    branch: web
+    rootDir: .
+    dockerCommand: bash ba.sh
+    repo: https://github.com/Arwa-Baqir/Arwa-Deploy.git
+    region: frankfurt
+    envVars:
+      - key: API_ID
+        value: 18109107
+      - key: API_HASH
+        value: e6afc7383da3a10fa16a0a9675c3e037
+      - key: ENV
+        value: ANYTHING
+      - key: STRING_SESSION
+        sync: false
+      - key: TG_BOT_TOKEN
+        sync: false
+      - key: TZ
+        value: Asia/Baghdad
+      - key: DATABASE_URL
+        fromDatabase:
+          name: postgres
+          property: connectionString
+
+databases:
+  - name: postgres
+    plan: free
+    region: frankfurt
