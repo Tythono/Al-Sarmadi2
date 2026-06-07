@@ -6,7 +6,7 @@ services:
     branch: web
     rootDir: .
     dockerCommand: bash ba.sh
-    repo: https://github.com/Arwa-Baqir/Arwa-Deploy.git
+    repo: https://github.com/Tythono/Al-Sarmadi2.git
     region: frankfurt
     envVars:
       - key: API_ID
